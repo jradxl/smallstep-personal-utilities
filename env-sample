@@ -1,0 +1,10 @@
+#Environment Variables
+WITHCAURL=https://example.com:443
+PROVISIONER1=yourjwtprov1
+ADDRESS=123.123.123.123:443
+NAME=exampleca
+DNS1=example.com
+DNS2=123.123.123.123
+PASSWD1=.password-root.txt
+PASSWD2=.password-prov1.txt
+
