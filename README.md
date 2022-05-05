@@ -10,6 +10,8 @@ Here, are install and upgrade scripts that offer the latest Packages as found on
 
 Also, install-ca.sh - Scripted install instead of being interactive
 
+NOTE: <name> represents your data
+	
 Example CA Install Log
 ```
 Installing Step CA...
