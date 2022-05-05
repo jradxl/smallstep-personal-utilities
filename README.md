@@ -11,7 +11,7 @@ Here, are install and upgrade scripts that offer the latest Packages as found on
 Also, install-ca.sh - Scripted install instead of being interactive
 
 Example CA Install Log
-
+```
 Installing Step CA...
 Current Step Path is: /home/<name>/.step
 
@@ -34,10 +34,10 @@ Generating user and host SSH certificate signing keys... done!
 ✔ Certificate Authority configuration: /home/<name>/.step/config/ca.json
 
 Your PKI is ready to go. To generate certificates for individual services see 'step help ca'.
-
+```
 
 Example defaults.json
-
+```
 :~/.step/config$ cat defaults.json 
 {
 	"ca-url": "https://<url>:443",
@@ -45,10 +45,10 @@ Example defaults.json
 	"fingerprint": "<3720c3f6eb1ac3c2a2-long-string-460ef898d297ffa56dde2f17278c8e2>",
 	"root": "/home/<name>/.step/certs/root_ca.crt"
 }
-
+```
 
 Example TREE
-
+```
 ~/.step$ tree
 .
 ├── certs
@@ -75,4 +75,4 @@ Example TREE
         └── step_includes.tpl
 
 6 directories, 16 files
-
+```
