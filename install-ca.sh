@@ -16,7 +16,8 @@ if [[ ! -f "$PASSWD2" ]]; then
     echo "No $PASSWD2  file exists. Quitting"
 fi
 
-echo "Current Step Path is: $(step-cli path)"
+export STEPPATH=$(step-cli path)
+echo "Current Step Path is: $STEPPATH"
 
 datetime=$(date +"%Y%m%d%H%M%S")
 echo "Current Time is: $datetime"
@@ -54,4 +55,15 @@ step-cli ca init --ssh \
 tar cf stepbakup-${datetime}.tar ~/.step
                  
 exit 0
+
+## For systemd use
+## https://smallstep.com/docs/step-ca/certificate-authority-server-production
+
+sudo useradd --system --home /etc/step-ca --shell /bin/false step
+sudo cp -r $STEPPATH  /etc/step-ca/
+NOTE: TODO, update paths in ca.json and defaults.json
+cp $PASSWD1 /etc/step-ca/password.txt
+chmod 600  /etc/step-ca/password.txt 
+chown -R step:step /etc/step-ca
+mkdir /etc/step-ca/db
 
