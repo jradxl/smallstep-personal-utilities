@@ -1,10 +1,17 @@
 #Environment Variables
+#Common file for use in various scripts
+#Copy to .env before use.
 
-CA_URL="https://yourdomain.co,"
+##For Bootstraping
+CA_URL="https://your-ca-domain.com"
 CA_FINGERPRINT="Your-Secret-Fingerprint-Long-Number"
 
+#For Adding a Host
+JWK_PROVISIONER="Your-jwk-provisioner"
+X5C_PROVISIONER="Your-x5c-provisioner"
 
-WITHCAURL=https://example.com:443
+##For initial CA installation
+WITHCAURL=${CA_URL}
 PROVISIONER1=yourjwtprov1
 ADDRESS=123.123.123.123:443
 NAME=exampleca
