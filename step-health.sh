@@ -1,6 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash
+##NB can't use -e
 
 ##  export STEPPATH=~/.step
+
+echo "Smallstep Health..."
+
 WHICHSTEP=$(which step)
 if [[ $WHICHSTEP != *"step"* ]]; then
     echo "Smallstep CLI not found"
@@ -32,8 +36,11 @@ if [[ ! -f "${FILE}" ]]; then
     echo "Configuration file defaults.json does not exist"
     exit 1
 else
+    echo "defaults.json is:-"
     cat ${FILE}
 fi
 
+echo ""
+echo "Smallstep Health OK!"
 exit 0
 
