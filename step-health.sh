@@ -1,16 +1,15 @@
 #!/bin/bash -e
 
 ##  export STEPPATH=~/.step
+WHICHSTEP=$(which step)
+if [[ $WHICHSTEP != *"step"* ]]; then
+    echo "Smallstep CLI not found"
+    exit 1
+fi
 
 HEALTH=$(step ca health)
 if [[ $HEALTH != "ok" ]]; then
     echo "CA Server Unhealthy!"
-    exit 1
-fi
-
-WHICHSTEP=$(which step)
-if [[ $WHICHSTEP != *"step"* ]]; then
-    echo "Smallstep CLI not found"
     exit 1
 fi
 
