@@ -1,76 +1,100 @@
 #!/bin/bash
+SELF="${0##*/}"
+
+#Test for Interactive use
+if [ ! -t 0 ] ; then
+    #keychain looks for ssh for version info
+    if [[ $SELF == "ssh" ]]; then
+        /usr/bin/ssh $@ 
+    fi
+    exit 0
+fi
+
+if [ ! -t 1 ] ; then
+    #keychain looks for ssh for version info
+    if [[ $SELF == "ssh" ]]; then
+        /usr/bin/ssh $@        
+    fi
+    exit 0
+fi
 
 if [[ -z "$1" ]]; then
-    echo "Usage: ssh.sh <user@example.com>"
+    echo "Usage: ssh <user@example.com>"
     exit 1
 else
     echo $1 
 fi
 
-
+#Email Address verification
 REGEX1="^(([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+|(\"([][,:;<>\&@a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~-]|(\\\\[\\ \"]))+\"))\.)*([-a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~]+|(\"([][,:;<>\&@a-zA-Z0-9\!#\$%\&\'*+/=?^_\`{\|}~-]|(\\\\[\\ \"]))+\"))@\w((-|\w)*\w)*\.(\w((-|\w)*\w)*\.)*\w{2,4}$"
 REGEX="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
 
-
+#Split email address.
+#Step configued to respond to Username only
 oldIFS="$IFS"
 IFS="@" read -r username domain <<< "$1"
 echo "Username: $username"
 echo "Domain: $domain"
 IFS=$oldIFS
-        
-RET=$(step ssh check-host -v "$domain")
 
+#Check Domain is supported by Step
+RET=$(step ssh check-host -v "$domain")
 if [[ $RET == "true" ]]; then
     echo "Domain [$domain] is supported by Smallstep"
 fi
 
+#Find if Username is currently in the Comments of any loaded keys
 KEYS=$(ssh-add -L)
-
 case "$KEYS" in
     *$username*) 
         echo "Username $username found in currently loaded keys"
         echo "Succes: You can try to login with ssh"
-        ssh $1
+        /usr/bin/ssh $1
      ;;
-    *) 
+    *)
+      # Not Found. Initiate a Step login, where the email address
+      # may be different
         echo "No Key found. You must make a SmallStep login..."
         while true; do
             read -r -p "Please enter your Keycloak Login Address ([Q/q]uit): " answer
             case $answer in
                  *[@]*) 
                     if [[ $answer =~ $REGEX ]] ; then
-                        echo "OK: $answer"
+                        echo "The email address you entered <$answer> has been validated."
                         break
                     else
-                        echo "not OK: $answer"
+                        echo "Sorry, what you entered is not a valid email address: <$answer>"
                     fi
                  ;;
                  [Qq]*)
-                    echo "Bye"
+                    echo "You chose to quit the application. Bye."
                     exit 0
-                    break
                  ;;             
                  *)
                     echo "Please enter a valid Smallstep Login email address <user@example.com>"
                  ;;
             esac
         done
+        #step ssh login passes much info to STDERR
+        #Here we parse to provide a shorted error message
         TMPFILE=$(mktemp)
         trap "rm -f $TMPFILE" 0 2 3 15     
         RET1=$(step ssh login --provisioner "KeyCloak1" $answer 2>$TMPFILE)
         RET2=$?
         #echo "STDOUT DATA: $RET1"
         #echo "RET Step Login: $RET2"
+        echo ""
         if [[ $RET2 != 0 ]]; then 
             RET3=$(grep "The request was forbidden by the certificate authority" "$TMPFILE")
-            #echo $RET3
+            echo "CA permission error."
+            echo $RET3
         else
-            echo ""
             echo "Success: You can try to login with ssh"
-            ssh $1
+            /usr/bin/ssh $1
         fi
-        
-        rm $TMPFILE  
+        if [[ -f $TMPFILE ]]; then
+	        rm -f $TMPFILE
+	    fi
      ;;
 esac
 
