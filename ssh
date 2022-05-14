@@ -21,8 +21,6 @@ fi
 if [[ -z "$1" ]]; then
     echo "Usage: ssh <user@example.com>"
     exit 1
-else
-    echo $1 
 fi
 
 #Email Address verification
@@ -33,9 +31,16 @@ REGEX="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-
 #Step configued to respond to Username only
 oldIFS="$IFS"
 IFS="@" read -r username domain <<< "$1"
+IFS=$oldIFS
+
+if [[ $username != "" && $domain == "" ]]; then
+    echo "Assuming Config Host"
+    /usr/bin/ssh $username
+    exit 0
+fi
+
 echo "Username: $username"
 echo "Domain: $domain"
-IFS=$oldIFS
 
 #Check Domain is supported by Step
 RET=$(step ssh check-host -v "$domain")
